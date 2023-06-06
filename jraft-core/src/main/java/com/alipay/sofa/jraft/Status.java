@@ -19,19 +19,20 @@ package com.alipay.sofa.jraft;
 import com.alipay.sofa.jraft.error.RaftError;
 import com.alipay.sofa.jraft.util.Copiable;
 
-//A Status encapsulates the result of an operation. It may indicate success,
-
-//or it may indicate an error with an associated error message. It's suitable
-//for passing status of functions with richer information than just error_code
-//in exception-forbidden code. This utility is inspired by leveldb::Status.
-//
-//Multiple threads can invoke const methods on a Status without
-//external synchronization, but if any of the threads may call a
-//non-const method, all threads accessing the same Status must use
-//external synchronization.
-//
-//Since failed status needs to allocate memory, you should be careful when
-//failed status is frequent.
+/**
+ * A Status encapsulates the result of an operation. It may indicate success,
+ * or it may indicate an error with an associated error message. It's suitable
+ * for passing status of functions with richer information than just error_code
+ * in exception-forbidden code. This utility is inspired by leveldb::Status.
+ *
+ * Multiple threads can invoke const methods on a Status without
+ * external synchronization, but if any of the threads may call a
+ * non-const method, all threads accessing the same Status must use
+ * external synchronization.
+ *
+ * Since failed status needs to allocate memory, you should be careful when
+ * failed status is frequent.
+ */
 public class Status implements Copiable<Status> {
 
     /**

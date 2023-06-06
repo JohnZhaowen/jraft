@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 /**
  * The counter operation
+ * counter的操作封装类，就是包含GET和INCREMENT
  *
  * @author likun (saimu.msm@antfin.com)
  */

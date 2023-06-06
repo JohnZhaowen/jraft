@@ -35,6 +35,8 @@ import java.io.IOException;
 /**
  * Counter server that keeps a counter value in a raft group.
  *
+ * 这是一个遵循raft协议的服务端，用于将当前节点封装成RaftGroupService
+ *
  * @author boyan (boyan@alibaba-inc.com)
  * <p>
  * 2018-Apr-09 4:51:02 PM
@@ -42,6 +44,8 @@ import java.io.IOException;
 public class CounterServer {
 
     private RaftGroupService    raftGroupService;
+
+    // 当前节点
     private Node                node;
     private CounterStateMachine fsm;
 
@@ -50,7 +54,7 @@ public class CounterServer {
         // init raft data path, it contains log,meta,snapshot
         FileUtils.forceMkdir(new File(dataPath));
 
-        // here use same RPC server for raft and business. It also can be seperated generally
+        // here use same RPC server for raft and business. It also can be separated generally
         final RpcServer rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint());
         // GrpcServer need init marshaller
         CounterGrpcHelper.initGRpc();
@@ -60,6 +64,7 @@ public class CounterServer {
         CounterService counterService = new CounterServiceImpl(this);
         rpcServer.registerProcessor(new GetValueRequestProcessor(counterService));
         rpcServer.registerProcessor(new IncrementAndGetRequestProcessor(counterService));
+
         // init state machine
         this.fsm = new CounterStateMachine();
         // set fsm to nodeOptions

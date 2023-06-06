@@ -18,6 +18,7 @@ package com.alipay.sofa.jraft.example.counter;
 
 /**
  * The counter service supporting query and count function.
+ * 定义两个counter操作
  *
  * @author likun (saimu.msm@antfin.com)
  */

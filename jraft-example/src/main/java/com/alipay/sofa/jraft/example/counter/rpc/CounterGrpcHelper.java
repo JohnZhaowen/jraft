@@ -36,8 +36,7 @@ public class CounterGrpcHelper {
             .getName())) {
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(CounterOutter.GetValueRequest.class.getName(),
                 CounterOutter.GetValueRequest.getDefaultInstance());
-            RpcFactoryHelper.rpcFactory().registerProtobufSerializer(
-                CounterOutter.IncrementAndGetRequest.class.getName(),
+            RpcFactoryHelper.rpcFactory().registerProtobufSerializer(CounterOutter.IncrementAndGetRequest.class.getName(),
                 CounterOutter.IncrementAndGetRequest.getDefaultInstance());
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(CounterOutter.ValueResponse.class.getName(),
                 CounterOutter.ValueResponse.getDefaultInstance());

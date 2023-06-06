@@ -53,6 +53,11 @@ public abstract class RepeatedTimer implements Describer {
         return this.timeoutMs;
     }
 
+    /**
+     *
+     * @param name RepeatedTimer实例的种类
+     * @param timeoutMs 超时时间
+     */
     public RepeatedTimer(final String name, final int timeoutMs) {
         this(name, timeoutMs, new HashedWheelTimer(new NamedThreadFactory(name, true), 1, TimeUnit.MILLISECONDS, 2048));
     }
@@ -83,6 +88,7 @@ public abstract class RepeatedTimer implements Describer {
     public void run() {
         this.invoking = true;
         try {
+            //真正处理业务逻辑
             onTrigger();
         } catch (final Throwable t) {
             LOG.error("Run timer failed.", t);
@@ -91,11 +97,14 @@ public abstract class RepeatedTimer implements Describer {
         this.lock.lock();
         try {
             this.invoking = false;
+            //如果已经被停止，则不再调用schedule方法，循环被打断，任务不再继续执行
             if (this.stopped) {
                 this.running = false;
                 invokeDestroyed = this.destroyed;
             } else {
+                //将timeout置为null
                 this.timeout = null;
+                //再次将run方法包装后放入调度器
                 schedule();
             }
         } finally {
@@ -132,19 +141,24 @@ public abstract class RepeatedTimer implements Describer {
      * Start the timer.
      */
     public void start() {
+        //加锁，只能一个线程调用这个方法
         this.lock.lock();
         try {
+            //如果已经被销毁，则不能再启动，默认是false
             if (this.destroyed) {
                 return;
             }
+            //默认是true，启动后该值置为false
             if (!this.stopped) {
                 return;
             }
             this.stopped = false;
+            //已经启动则不能再启动
             if (this.running) {
                 return;
             }
             this.running = true;
+            //调度方法
             schedule();
         } finally {
             this.lock.unlock();
@@ -174,16 +188,21 @@ public abstract class RepeatedTimer implements Describer {
     }
 
     private void schedule() {
+        //任务执行完成之后，timeout会置为null，如果不是null，则说明任务过期了，然后调用cancel方法取消过期任务
         if (this.timeout != null) {
             this.timeout.cancel();
         }
+
+        //创建一个TimerTask，实现其run方法
         final TimerTask timerTask = timeout -> {
             try {
+                //调用RepeatedTimer中的run方法
                 RepeatedTimer.this.run();
             } catch (final Throwable t) {
                 LOG.error("Run timer task failed, taskName={}.", RepeatedTimer.this.name, t);
             }
         };
+        //将上面创建好的TimerTask加入到Timer中进行调度，并启动计时
         this.timeout = this.timer.newTimeout(timerTask, adjustTimeout(this.timeoutMs), TimeUnit.MILLISECONDS);
     }
 

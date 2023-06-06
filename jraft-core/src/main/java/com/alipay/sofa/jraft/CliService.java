@@ -129,6 +129,7 @@ public interface CliService extends Lifecycle<CliOptions> {
 
     /**
      * Transfer the leader of the replication group to the target peer
+     * 指定leader？？？
      *
      * @param groupId the raft group id
      * @param conf    current configuration

@@ -19,6 +19,8 @@
 
 package com.alipay.sofa.jraft.rpc;
 
+import com.google.protobuf.GeneratedMessageV3;
+
 public final class CliRequests {
     private CliRequests() {
     }
@@ -8556,13 +8558,13 @@ public final class CliRequests {
     /**
      * Protobuf type {@code jraft.GetLeaderRequest}
      */
-    public static final class GetLeaderRequest extends com.google.protobuf.GeneratedMessageV3 implements
+    public static final class GetLeaderRequest extends GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:jraft.GetLeaderRequest)
                                                                                              GetLeaderRequestOrBuilder {
         private static final long serialVersionUID = 0L;
 
         // Use GetLeaderRequest.newBuilder() to construct.
-        private GetLeaderRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        private GetLeaderRequest(GeneratedMessageV3.Builder<?> builder) {
             super(builder);
         }
 
@@ -8942,17 +8944,16 @@ public final class CliRequests {
                 return com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest.getDefaultInstance();
             }
 
-            public com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest build() {
-                com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest result = buildPartial();
+            public CliRequests.GetLeaderRequest build() {
+                CliRequests.GetLeaderRequest result = buildPartial();
                 if (!result.isInitialized()) {
                     throw newUninitializedMessageException(result);
                 }
                 return result;
             }
 
-            public com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest buildPartial() {
-                com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest result = new com.alipay.sofa.jraft.rpc.CliRequests.GetLeaderRequest(
-                    this);
+            public CliRequests.GetLeaderRequest buildPartial() {
+                CliRequests.GetLeaderRequest result = new CliRequests.GetLeaderRequest(this);
                 int from_bitField0_ = bitField0_;
                 int to_bitField0_ = 0;
                 if (((from_bitField0_ & 0x00000001) == 0x00000001)) {

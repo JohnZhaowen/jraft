@@ -23,18 +23,21 @@ public class RpcOptions {
 
     /**
      * Rpc connect timeout in milliseconds
+     * RPC连接超时事件
      * Default: 1000(1s)
      */
     private int                       rpcConnectTimeoutMs        = 1000;
 
     /**
      * RPC request default timeout in milliseconds
+     * RPC请求超时事件
      * Default: 5000(5s)
      */
     private int                       rpcDefaultTimeout          = 5000;
 
     /**
      * Install snapshot RPC request default timeout in milliseconds
+     * RPC请求安装快照超时时间
      * Default: 5 * 60 * 1000(5min)
      */
     private int                       rpcInstallSnapshotTimeout  = 5 * 60 * 1000;

@@ -20,6 +20,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Defined functions for process user defined request.
+ * 定义处理用户请求的方法
  *
  * @author jiachun.fjc
  */
@@ -36,6 +37,7 @@ public interface RpcProcessor<T> {
     /**
      * The class name of user request.
      * Use String type to avoid loading class.
+     * 感兴趣的请求
      *
      * @return interested request's class name
      */

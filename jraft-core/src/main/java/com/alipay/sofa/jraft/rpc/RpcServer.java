@@ -21,6 +21,10 @@ import com.alipay.sofa.jraft.rpc.impl.ConnectionClosedEventListener;
 
 /**
  *
+ * RPC有两种实现：
+ * 1.grpc
+ * 2.sofaRpc的bolt
+ *
  * @author jiachun.fjc
  */
 public interface RpcServer extends Lifecycle<Void> {
@@ -34,6 +38,8 @@ public interface RpcServer extends Lifecycle<Void> {
 
     /**
      * Register user processor.
+     * 注册请求处理器，当客户端发送请求过来时，被封装成data，服务端需要根据data的class类型来分配不同的处理器
+     * 这里注册的处理器就是对应不同class类型的data
      *
      * @param processor the user processor which has a interest
      */

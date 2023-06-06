@@ -19,6 +19,8 @@
 
 package com.alipay.sofa.jraft.rpc;
 
+import com.google.protobuf.GeneratedMessageV3;
+
 public final class RpcRequests {
     private RpcRequests() {
     }
@@ -48,7 +50,7 @@ public final class RpcRequests {
     /**
      * Protobuf type {@code jraft.PingRequest}
      */
-    public static final class PingRequest extends com.google.protobuf.GeneratedMessageV3 implements
+    public static final class PingRequest extends GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:jraft.PingRequest)
                                                                                         PingRequestOrBuilder {
         private static final long serialVersionUID = 0L;

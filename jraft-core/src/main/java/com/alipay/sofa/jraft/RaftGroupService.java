@@ -32,6 +32,11 @@ import com.alipay.sofa.jraft.util.Utils;
 /**
  * A framework to implement a raft group service.
  *
+ * raft成员的服务
+ * 主要负责：
+ * 1.将当前服务作为raft集群的一个node加入集群
+ * 2. 为当前node初始化rpc，作为rpc server来处理业务请求
+ *
  * @author boyan (boyan@alibaba-inc.com)
  *
  * 2018-Apr-08 7:53:03 PM
@@ -124,8 +129,10 @@ public class RaftGroupService {
             throw new IllegalArgumentException("Blank group id:" + this.groupId);
         }
         //Adds RPC server to Server.
+        //将当前节点加入Node管理器
         NodeManager.getInstance().addAddress(this.serverId.getEndpoint());
 
+        //将当前节点加入raft集群
         this.node = RaftServiceFactory.createAndInitRaftNode(this.groupId, this.serverId, this.nodeOptions);
         if (startRpcServer) {
             this.rpcServer.init(null);

@@ -19,6 +19,9 @@
 
 package com.alipay.sofa.jraft.entity;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessageV3;
+
 public final class LocalFileMetaOutter {
     private LocalFileMetaOutter() {
     }
@@ -159,18 +162,18 @@ public final class LocalFileMetaOutter {
     /**
      * Protobuf type {@code jraft.LocalFileMeta}
      */
-    public static final class LocalFileMeta extends com.google.protobuf.GeneratedMessageV3 implements
+    public static final class LocalFileMeta extends GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:jraft.LocalFileMeta)
                                                                                           LocalFileMetaOrBuilder {
         private static final long serialVersionUID = 0L;
 
         // Use LocalFileMeta.newBuilder() to construct.
-        private LocalFileMeta(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        private LocalFileMeta(GeneratedMessageV3.Builder<?> builder) {
             super(builder);
         }
 
         private LocalFileMeta() {
-            userMeta_ = com.google.protobuf.ByteString.EMPTY;
+            userMeta_ = ByteString.EMPTY;
             source_ = 0;
             checksum_ = "";
         }

@@ -42,8 +42,7 @@ import com.alipay.sofa.jraft.util.timer.RaftTimerFactory;
  */
 public final class JRaftUtils {
 
-    private final static RaftTimerFactory TIMER_FACTORY = JRaftServiceLoader.load(RaftTimerFactory.class) //
-                                                            .first();
+    private final static RaftTimerFactory TIMER_FACTORY = JRaftServiceLoader.load(RaftTimerFactory.class).first();
 
     /**
      * Get raft timer factory.

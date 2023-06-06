@@ -140,8 +140,7 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class NodeImpl implements Node, RaftServerService {
 
-    private static final Logger                                            LOG                      = LoggerFactory
-                                                                                                        .getLogger(NodeImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NodeImpl.class);
 
     static {
         try {
@@ -158,27 +157,21 @@ public class NodeImpl implements Node, RaftServerService {
         }
     }
 
-    public final static RaftTimerFactory                                   TIMER_FACTORY            = JRaftUtils
-                                                                                                        .raftTimerFactory();
-
-    public static final AtomicInteger                                      GLOBAL_NUM_NODES         = new AtomicInteger(
-                                                                                                        0);
+    public final static RaftTimerFactory TIMER_FACTORY = JRaftUtils.raftTimerFactory();
+    public static final AtomicInteger GLOBAL_NUM_NODES = new AtomicInteger(0);
 
     /** Internal states */
-    private final ReadWriteLock                                            readWriteLock            = new NodeReadWriteLock(
-                                                                                                        this);
-    protected final Lock                                                   writeLock                = this.readWriteLock
-                                                                                                        .writeLock();
-    protected final Lock                                                   readLock                 = this.readWriteLock
-                                                                                                        .readLock();
-    private volatile State                                                 state;
-    private volatile CountDownLatch                                        shutdownLatch;
-    private long                                                           currTerm;
-    private volatile long                                                  lastLeaderTimestamp;
-    private PeerId                                                         leaderId                 = new PeerId();
-    private PeerId                                                         votedId;
-    private final Ballot                                                   voteCtx                  = new Ballot();
-    private final Ballot                                                   prevVoteCtx              = new Ballot();
+    private final ReadWriteLock readWriteLock = new NodeReadWriteLock(this);
+    protected final Lock writeLock                = this.readWriteLock.writeLock();
+    protected final Lock readLock                 = this.readWriteLock.readLock();
+    private volatile State state;
+    private volatile CountDownLatch shutdownLatch;
+    private long currTerm;
+    private volatile long lastLeaderTimestamp;
+    private PeerId leaderId = new PeerId();
+    private PeerId votedId;
+    private final Ballot voteCtx = new Ballot();
+    private final Ballot prevVoteCtx  = new Ballot();
     private ConfigurationEntry                                             conf;
     private StopTransferArg                                                stopTransferArg;
     /** Raft group and node options and identifier */
@@ -293,8 +286,7 @@ public class NodeImpl implements Node, RaftServerService {
         private final List<LogEntryAndClosure> tasks = new ArrayList<>(NodeImpl.this.raftOptions.getApplyBatch());
 
         @Override
-        public void onEvent(final LogEntryAndClosure event, final long sequence, final boolean endOfBatch)
-                                                                                                          throws Exception {
+        public void onEvent(final LogEntryAndClosure event, final long sequence, final boolean endOfBatch) {
             if (event.shutdownLatch != null) {
                 if (!this.tasks.isEmpty()) {
                     executeApplyingTasks(this.tasks);
@@ -620,9 +612,11 @@ public class NodeImpl implements Node, RaftServerService {
         boolean doUnlock = true;
         this.writeLock.lock();
         try {
+            //也就是只有follower才会发起evection
             if (this.state != State.STATE_FOLLOWER) {
                 return;
             }
+            //如果当前leader心跳时间并没有超时，则直接返回
             if (isCurrentLeaderValid()) {
                 return;
             }
@@ -661,7 +655,7 @@ public class NodeImpl implements Node, RaftServerService {
             return false;
         }
 
-        // If this nodes disable priority election, then it can make a election.
+        // If this node disable priority election, then it can make a election.
         if (this.serverId.isPriorityDisabled()) {
             return true;
         }

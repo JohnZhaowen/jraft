@@ -19,15 +19,19 @@
 
 package com.alipay.sofa.jraft.example.counter.rpc;
 
+import com.google.protobuf.*;
+
+import java.io.IOException;
+
 public final class CounterOutter {
     private CounterOutter() {
     }
 
-    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistryLite registry) {
+    public static void registerAllExtensions(ExtensionRegistryLite registry) {
     }
 
-    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistry registry) {
-        registerAllExtensions((com.google.protobuf.ExtensionRegistryLite) registry);
+    public static void registerAllExtensions(ExtensionRegistry registry) {
+        registerAllExtensions((ExtensionRegistryLite) registry);
     }
 
     public interface GetValueRequestOrBuilder extends
@@ -513,7 +517,7 @@ public final class CounterOutter {
 
     public interface IncrementAndGetRequestOrBuilder extends
     // @@protoc_insertion_point(interface_extends:jraft.IncrementAndGetRequest)
-                                                    com.google.protobuf.MessageOrBuilder {
+            MessageOrBuilder {
 
         /**
          * <code>required int64 delta = 1;</code>
@@ -529,13 +533,11 @@ public final class CounterOutter {
     /**
      * Protobuf type {@code jraft.IncrementAndGetRequest}
      */
-    public static final class IncrementAndGetRequest extends com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:jraft.IncrementAndGetRequest)
-                                                                                                   IncrementAndGetRequestOrBuilder {
+    public static final class IncrementAndGetRequest extends GeneratedMessageV3 implements IncrementAndGetRequestOrBuilder {
         private static final long serialVersionUID = 0L;
 
         // Use IncrementAndGetRequest.newBuilder() to construct.
-        private IncrementAndGetRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        private IncrementAndGetRequest(GeneratedMessageV3.Builder<?> builder) {
             super(builder);
         }
 
@@ -548,9 +550,8 @@ public final class CounterOutter {
             return this.unknownFields;
         }
 
-        private IncrementAndGetRequest(com.google.protobuf.CodedInputStream input,
-                                       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                                                                                                   throws com.google.protobuf.InvalidProtocolBufferException {
+        private IncrementAndGetRequest(CodedInputStream input,
+                                       ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
             this();
             if (extensionRegistry == null) {
                 throw new NullPointerException();
@@ -579,17 +580,17 @@ public final class CounterOutter {
                         }
                     }
                 }
-            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            } catch (InvalidProtocolBufferException e) {
                 throw e.setUnfinishedMessage(this);
             } catch (java.io.IOException e) {
-                throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
+                throw new InvalidProtocolBufferException(e).setUnfinishedMessage(this);
             } finally {
                 this.unknownFields = unknownFields.build();
                 makeExtensionsImmutable();
             }
         }
 
-        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+        public static final Descriptors.Descriptor getDescriptor() {
             return CounterOutter.internal_static_jraft_IncrementAndGetRequest_descriptor;
         }
 
@@ -633,7 +634,7 @@ public final class CounterOutter {
             return true;
         }
 
-        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+        public void writeTo(CodedOutputStream output) throws IOException {
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 output.writeInt64(1, delta_);
             }
@@ -647,7 +648,7 @@ public final class CounterOutter {
 
             size = 0;
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                size += com.google.protobuf.CodedOutputStream.computeInt64Size(1, delta_);
+                size += CodedOutputStream.computeInt64Size(1, delta_);
             }
             size += unknownFields.getSerializedSize();
             memoizedSize = size;
@@ -1054,7 +1055,7 @@ public final class CounterOutter {
     /**
      * Protobuf type {@code jraft.ValueResponse}
      */
-    public static final class ValueResponse extends com.google.protobuf.GeneratedMessageV3 implements
+    public static final class ValueResponse extends GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:jraft.ValueResponse)
                                                                                           ValueResponseOrBuilder {
         private static final long serialVersionUID = 0L;

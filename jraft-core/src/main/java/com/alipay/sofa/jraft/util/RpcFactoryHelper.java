@@ -24,6 +24,7 @@ import com.alipay.sofa.jraft.rpc.RpcResponseFactory;
  */
 public class RpcFactoryHelper {
 
+    //SPI机制加载RaftRpcFactory
     private static final RaftRpcFactory RPC_FACTORY = JRaftServiceLoader.load(RaftRpcFactory.class) //
                                                         .first();
 

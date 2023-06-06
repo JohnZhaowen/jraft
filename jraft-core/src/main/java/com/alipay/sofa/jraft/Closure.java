@@ -18,6 +18,7 @@ package com.alipay.sofa.jraft;
 
 /**
  * Callback closure.
+ * 回调闭包
  *
  * @author boyan (boyan@alibaba-inc.com)
  *

@@ -23,6 +23,7 @@ public interface RpcContext {
 
     /**
      * Send a response back.
+     * 发送响应
      *
      * @param responseObj the response object
      */

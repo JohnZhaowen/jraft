@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Counter snapshot file.
+ * 快照文件，含存储快照和加载快照方法
  *
  * @author boyan (boyan@alibaba-inc.com)
  *

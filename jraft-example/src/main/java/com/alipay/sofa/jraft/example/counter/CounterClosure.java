@@ -20,6 +20,9 @@ import com.alipay.sofa.jraft.Closure;
 import com.alipay.sofa.jraft.example.counter.rpc.CounterOutter.ValueResponse;
 
 /**
+ *
+ * counter回调闭包，含有两个匿名内部类实现，分别对应的是GET和INCREMENT操作的回调
+ *
  * @author likun (saimu.msm@antfin.com)
  */
 public abstract class CounterClosure implements Closure {

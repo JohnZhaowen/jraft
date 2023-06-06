@@ -31,6 +31,7 @@ import com.alipay.sofa.jraft.storage.snapshot.SnapshotWriter;
 /**
  * State machine adapter that implements all methods with default behavior
  * except {@link #onApply(com.alipay.sofa.jraft.Iterator)}.
+ * 状态机的默认实现，除了onApply
  *
  * @author boyan (boyan@alibaba-inc.com)
  *

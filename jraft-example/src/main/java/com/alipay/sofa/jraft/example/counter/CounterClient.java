@@ -32,14 +32,22 @@ import java.util.concurrent.Executor;
 public class CounterClient {
 
     public static void main(final String[] args) throws Exception {
+
+        /**
+         * 需要传入两个参数：
+         * 1.groupId
+         * 2.配置字符串，指定raft集群地址
+         */
         if (args.length != 2) {
             System.out.println("Usage : java com.alipay.sofa.jraft.example.counter.CounterClient {groupId} {conf}");
             System.out
                 .println("Example: java com.alipay.sofa.jraft.example.counter.CounterClient counter 127.0.0.1:8081,127.0.0.1:8082,127.0.0.1:8083");
             System.exit(1);
         }
+
+
         final String groupId = args[0];
-        final String confStr = args[1];
+        final String confStr = args[1]; //127.0.0.1:8081 127.0.0.1:8081,127.0.0.1:8082,127.0.0.1:8083
         CounterGrpcHelper.initGRpc();
 
         final Configuration conf = new Configuration();
@@ -50,6 +58,7 @@ public class CounterClient {
         RouteTable.getInstance().updateConfiguration(groupId, conf);
 
         final CliClientServiceImpl cliClientService = new CliClientServiceImpl();
+        //创建了rpcClient
         cliClientService.init(new CliOptions());
 
         if (!RouteTable.getInstance().refreshLeader(cliClientService, groupId, 1000).isOk()) {
@@ -61,6 +70,8 @@ public class CounterClient {
         final int n = 1000;
         final CountDownLatch latch = new CountDownLatch(n);
         final long start = System.currentTimeMillis();
+
+        //计算 1 + 2 + ... + 1000的结果
         for (int i = 0; i < n; i++) {
             incrementAndGet(cliClientService, leader, i, latch);
         }

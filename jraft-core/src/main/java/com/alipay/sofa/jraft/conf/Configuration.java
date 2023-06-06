@@ -35,6 +35,7 @@ import com.alipay.sofa.jraft.util.Requires;
 /**
  * A configuration with a set of peers.
  * @author boyan (boyan@alibaba-inc.com)
+ * 就是存储了集群的节点信息
  *
  * 2018-Mar-15 11:00:26 AM
  */
@@ -44,8 +45,14 @@ public class Configuration implements Iterable<PeerId>, Copiable<Configuration> 
 
     private static final String   LEARNER_POSTFIX = "/learner";
 
+    /**
+     * 参与者列表
+     */
     private List<PeerId>          peers           = new ArrayList<>();
 
+    /**
+     * learners列表，learner不参与选举，不作为quorum的一员
+     */
     // use LinkedHashSet to keep insertion order.
     private LinkedHashSet<PeerId> learners        = new LinkedHashSet<>();
 

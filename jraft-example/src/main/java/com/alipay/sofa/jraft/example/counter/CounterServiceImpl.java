@@ -34,6 +34,7 @@ import com.alipay.sofa.jraft.rhea.options.StoreEngineOptions;
 import com.alipay.sofa.jraft.util.BytesUtil;
 
 /**
+ *
  * @author likun (saimu.msm@antfin.com)
  */
 public class CounterServiceImpl implements CounterService {
@@ -55,6 +56,7 @@ public class CounterServiceImpl implements CounterService {
     @Override
     public void get(final boolean readOnlySafe, final CounterClosure closure) {
         if(!readOnlySafe){
+            //如果不需要保证线性一致性读，则直接从状态机中读取
             closure.success(getValue());
             closure.run(Status.OK());
             return;
@@ -68,11 +70,13 @@ public class CounterServiceImpl implements CounterService {
                     closure.run(Status.OK());
                     return;
                 }
+
                 CounterServiceImpl.this.readIndexExecutor.execute(() -> {
                     if(isLeader()){
                         LOG.debug("Fail to get value with 'ReadIndex': {}, try to applying to the state machine.", status);
                         applyOperation(CounterOperation.createGet(), closure);
                     }else {
+
                         handlerNotLeaderError(closure);
                     }
                 });

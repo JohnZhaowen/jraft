@@ -60,19 +60,19 @@ import com.google.protobuf.Message;
  */
 public class GrpcServer implements RpcServer {
 
-    private static final Logger                       LOG                  = LoggerFactory.getLogger(GrpcServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GrpcServer.class);
 
-    private static final String                       EXECUTOR_NAME        = "grpc-default-executor";
+    private static final String EXECUTOR_NAME = "grpc-default-executor";
 
-    private final Server                              server;
-    private final MutableHandlerRegistry              handlerRegistry;
-    private final Map<String, Message>                parserClasses;
-    private final MarshallerRegistry                  marshallerRegistry;
-    private final List<ServerInterceptor>             serverInterceptors   = new CopyOnWriteArrayList<>();
+    private final Server server;
+    private final MutableHandlerRegistry handlerRegistry;
+    private final Map<String, Message> parserClasses;
+    private final MarshallerRegistry marshallerRegistry;
+    private final List<ServerInterceptor> serverInterceptors = new CopyOnWriteArrayList<>();
     private final List<ConnectionClosedEventListener> closedEventListeners = new CopyOnWriteArrayList<>();
-    private final AtomicBoolean                       started              = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
-    private ExecutorService                           defaultExecutor;
+    private ExecutorService defaultExecutor;
 
     public GrpcServer(Server server, MutableHandlerRegistry handlerRegistry, Map<String, Message> parserClasses,
                       MarshallerRegistry marshallerRegistry) {

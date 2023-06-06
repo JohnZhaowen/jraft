@@ -30,6 +30,9 @@ import com.alipay.sofa.jraft.Status;
  */
 public abstract class CatchUpClosure implements Closure {
 
+    /**
+     * 最大的延迟
+     */
     private long               maxMargin;
     private ScheduledFuture<?> timer;
     private boolean            hasTimer;

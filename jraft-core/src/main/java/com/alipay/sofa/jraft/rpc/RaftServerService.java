@@ -35,6 +35,7 @@ public interface RaftServerService {
 
     /**
      * Handle pre-vote request.
+     * 处理预投票请求
      *
      * @param request   data of the pre vote
      * @return the response message
@@ -43,6 +44,7 @@ public interface RaftServerService {
 
     /**
      * Handle request-vote request.
+     * 处理投票请求
      *
      * @param request   data of the vote
      * @return the response message
@@ -62,6 +64,7 @@ public interface RaftServerService {
     /**
      * Handle install-snapshot request, return response message or
      * called done.run() with response.
+     * 生成快照
      *
      * @param request   data of the install snapshot request
      * @param done      callback
@@ -73,6 +76,7 @@ public interface RaftServerService {
      * Handle time-out-now request, return response message or
      * called done.run() with response.
      *
+     *
      * @param request   data of the timeout now request
      * @param done      callback
      * @return the response message
@@ -81,6 +85,7 @@ public interface RaftServerService {
 
     /**
      * Handle read-index request, call the RPC closure with response.
+     * 处理线性一致性读请求
      *
      * @param request   data of the readIndex read
      * @param done      callback

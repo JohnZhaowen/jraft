@@ -88,11 +88,14 @@ public class CounterStateMachine extends StateMachineAdapter {
             CounterOperation counterOperation = null;
 
             CounterClosure closure = null;
+            // done 回调不为null，必须在应用日志后调用，如果不为 null，说明当前是leader。
             if (iter.done() != null) {
                 // This task is applied by this node, get value from closure to avoid additional parsing.
+                // 当前是leader，可以直接从 IncrementAndAddClosure 中获取 delta，避免反序列化
                 closure = (CounterClosure) iter.done();
                 counterOperation = closure.getCounterOperation();
             } else {
+                // 其他节点应用此日志，需要反序列化 IncrementAndGetRequest，获取 delta
                 // Have to parse FetchAddRequest from this user log.
                 final ByteBuffer data = iter.getData();
                 try {
@@ -116,6 +119,7 @@ public class CounterStateMachine extends StateMachineAdapter {
                     case INCREMENT:
                         final long delta = counterOperation.getDelta();
                         final long prev = this.value.get();
+                        // 更新状态机
                         current = this.value.addAndGet(delta);
                         LOG.info("Added value={} by delta={} at logIndex={}", prev, delta, iter.getIndex());
                         break;
@@ -154,10 +158,12 @@ public class CounterStateMachine extends StateMachineAdapter {
 
     @Override
     public boolean onSnapshotLoad(final SnapshotReader reader) {
+        //如果是leader，是不允许加载快照的
         if (isLeader()) {
             LOG.warn("Leader is not supposed to load snapshot");
             return false;
         }
+        //没有快照文件
         if (reader.getFileMeta("data") == null) {
             LOG.error("Fail to find data file in {}", reader.getPath());
             return false;
@@ -173,6 +179,10 @@ public class CounterStateMachine extends StateMachineAdapter {
 
     }
 
+    /**
+     * 如果被选举为leaser，那么为term赋值
+     * @param term new term num
+     */
     @Override
     public void onLeaderStart(final long term) {
         this.leaderTerm.set(term);
@@ -180,6 +190,10 @@ public class CounterStateMachine extends StateMachineAdapter {
 
     }
 
+    /**
+     * 如果退出leader角色，则将term置为-1
+     * @param status status info
+     */
     @Override
     public void onLeaderStop(final Status status) {
         this.leaderTerm.set(-1);
