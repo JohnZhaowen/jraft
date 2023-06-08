@@ -91,7 +91,7 @@ public class ConfigurationEntry {
     /**
      * Returns true when the conf entry is valid.
      *
-     * @return if the the entry is valid
+     * @return whether the entry is valid
      */
     public boolean isValid() {
         if (!this.conf.isValid()) {

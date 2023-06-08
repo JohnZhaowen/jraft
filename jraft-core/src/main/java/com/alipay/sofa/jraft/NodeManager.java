@@ -68,7 +68,7 @@ public class NodeManager {
     }
 
     /**
-     * Adds a RPC service address.
+     * Adds an RPC service address.
      */
     public void addAddress(final Endpoint addr) {
         this.addrSet.add(addr);

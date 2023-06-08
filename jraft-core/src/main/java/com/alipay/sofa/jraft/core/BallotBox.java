@@ -40,20 +40,30 @@ import com.alipay.sofa.jraft.util.SegmentList;
  * Ballot box for voting.
  * @author boyan (boyan@alibaba-inc.com)
  *
+ * 投票机制是 Raft 算法运行的基础，JRaft 在实现上为每个节点都设置了一个选票箱 BallotBox 实例，[[**用于对 LogEntry 是否提交进行仲裁**]]
+ *
  * 2018-Apr-04 2:32:10 PM
  */
 @ThreadSafe
 public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
 
-    private static final Logger       LOG                = LoggerFactory.getLogger(BallotBox.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BallotBox.class);
 
-    private FSMCaller                 waiter;
-    private ClosureQueue              closureQueue;
-    private final StampedLock         stampedLock        = new StampedLock();
-    private long                      lastCommittedIndex = 0;
-    private long                      pendingIndex;
-    private final SegmentList<Ballot> pendingMetaQueue   = new SegmentList<>(false);
-    private BallotBoxOptions          opts;
+    //就是closureQueue的消费者
+    private FSMCaller waiter;
+
+    //投票箱往该队列提交任务
+    private ClosureQueue closureQueue;
+
+    /**
+     * StampedLock和ReadWriteLock相比，改进之处在于：读的过程中也允许获取写锁后写入！这
+     * 样一来，我们读的数据就可能不一致，所以，需要一点额外的代码来判断读的过程中是否有写入，这种读锁是一种乐观锁。
+     */
+    private final StampedLock stampedLock = new StampedLock();
+    private long lastCommittedIndex = 0;
+    private long pendingIndex;
+    private final SegmentList<Ballot> pendingMetaQueue = new SegmentList<>(false);
+    private BallotBoxOptions opts;
 
     @OnlyForTest
     long getPendingIndex() {
@@ -65,12 +75,23 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
         return this.pendingMetaQueue;
     }
 
+
+    /**
+     * 获取上一次提交日志的索引
+     * @return
+     */
     public long getLastCommittedIndex() {
+
+        //获取乐观读锁
         long stamp = this.stampedLock.tryOptimisticRead();
         final long optimisticVal = this.lastCommittedIndex;
+
+        //如果中间没有发生写操作，那么读取到的lastCommittedIndex就是正确的值，直接返回
         if (this.stampedLock.validate(stamp)) {
             return optimisticVal;
         }
+
+        //如果中间发生了写，读取到的脏数据，那么就升级乐观读锁为悲观读锁，再次读取lastCommittedIndex。并返回
         stamp = this.stampedLock.readLock();
         try {
             return this.lastCommittedIndex;
@@ -92,8 +113,12 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
     }
 
     /**
-     * Called by leader, otherwise the behavior is undefined
+     *
+     * 每一个follower投票后，rpc返回后调用这个方法
+     *
+     * Called by leader, otherwise the behavior is undefined.
      * Set logs in [first_log_index, last_log_index] are stable at |peer|.
+     *
      */
     public boolean commitAt(final long firstLogIndex, final long lastLogIndex, final PeerId peer) {
         // TODO  use lock-free algorithm here?
@@ -116,10 +141,13 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
             for (long logIndex = startAt; logIndex <= lastLogIndex; logIndex++) {
                 final Ballot bl = this.pendingMetaQueue.get((int) (logIndex - this.pendingIndex));
                 hint = bl.grant(peer, hint);
+                // 当半数以上节点commit，这里lastCommittedIndex赋值为logIndex
                 if (bl.isGranted()) {
                     lastCommittedIndex = logIndex;
                 }
             }
+
+            // 如果没有过半节点commit，这里会直接返回
             if (lastCommittedIndex == 0) {
                 return true;
             }
@@ -137,12 +165,15 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
         } finally {
             this.stampedLock.unlockWrite(stamp);
         }
+
+        // 如果有过半节点commit，则调用FSMCaller.onCommitted
         this.waiter.onCommitted(lastCommittedIndex);
         return true;
     }
 
     /**
-     * Called when the leader steps down, otherwise the behavior is undefined
+     * 也就是只有leader降级时才会被调用
+     * Called when the leader steps down, otherwise the behavior is undefined.
      * When a leader steps down, the uncommitted user applications should
      * fail immediately, which the new leader will deal whether to commit or
      * truncate.
@@ -161,7 +192,7 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
     /**
      * Called when a candidate becomes the new leader, otherwise the behavior is
      * undefined.
-     * According the the raft algorithm, the logs from previous terms can't be
+     * According to the raft algorithm, the logs from previous terms can't be
      * committed until a log at the new term becomes committed, so
      * |newPendingIndex| should be |last_log_index| + 1.
      * @param newPendingIndex pending index of new leader
@@ -189,6 +220,8 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
     }
 
     /**
+     * 当要投票决定某个操作是否commit时，先将操作放在这里
+     *
      * Called by leader, otherwise the behavior is undefined
      * Store application context before replication.
      *
@@ -198,11 +231,14 @@ public class BallotBox implements Lifecycle<BallotBoxOptions>, Describer {
      * @return          returns true on success
      */
     public boolean appendPendingTask(final Configuration conf, final Configuration oldConf, final Closure done) {
+
+        //封装ballot
         final Ballot bl = new Ballot();
         if (!bl.init(conf, oldConf)) {
             LOG.error("Fail to init ballot.");
             return false;
         }
+
         final long stamp = this.stampedLock.writeLock();
         try {
             if (this.pendingIndex <= 0) {

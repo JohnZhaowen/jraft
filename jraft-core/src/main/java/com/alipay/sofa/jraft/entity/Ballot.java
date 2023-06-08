@@ -23,6 +23,7 @@ import com.alipay.sofa.jraft.conf.Configuration;
 
 /**
  * A ballot to vote.
+ * 代表一个投票，用来确定日志是否提交
  *
  * @author boyan (boyan@alibaba-inc.com)
  *
@@ -49,7 +50,11 @@ public class Ballot {
     }
 
     private final List<UnfoundPeerId> peers    = new ArrayList<>();
+
+    //大多数
     private int                       quorum;
+
+
     private final List<UnfoundPeerId> oldPeers = new ArrayList<>();
     private int                       oldQuorum;
 
@@ -63,6 +68,8 @@ public class Ballot {
     public boolean init(final Configuration conf, final Configuration oldConf) {
         this.peers.clear();
         this.oldPeers.clear();
+
+        //处理conf
         this.quorum = this.oldQuorum = 0;
         int index = 0;
         if (conf != null) {
@@ -70,8 +77,9 @@ public class Ballot {
                 this.peers.add(new UnfoundPeerId(peer, index++, false));
             }
         }
-
         this.quorum = this.peers.size() / 2 + 1;
+
+        //处理oldConf
         if (oldConf == null) {
             return true;
         }
@@ -79,8 +87,8 @@ public class Ballot {
         for (final PeerId peer : oldConf) {
             this.oldPeers.add(new UnfoundPeerId(peer, index++, false));
         }
-
         this.oldQuorum = this.oldPeers.size() / 2 + 1;
+
         return true;
     }
 
@@ -132,6 +140,7 @@ public class Ballot {
 
     /**
      * Returns true when the ballot is granted.
+     * 如果集群的节点数是5，那么初始的quorum就是3，在grant方法中，获取一个投票，quorum--，当quorum<=0是说明获取了半数以上的投票
      *
      * @return true if the ballot is granted
      */

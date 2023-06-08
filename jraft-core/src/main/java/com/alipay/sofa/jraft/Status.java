@@ -93,7 +93,7 @@ public class Status implements Copiable<Status> {
     }
 
     /**
-     * Creates a OK status instance.
+     * Creates an OK status instance.
      */
     public static Status OK() {
         return new Status();

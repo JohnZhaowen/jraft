@@ -162,6 +162,16 @@ public class LogManagerImpl implements LogManager {
         this.lastLogIndexListeners.remove(listener);
     }
 
+
+    /**
+     * 整个 LogManager 的初始化过程除了对本地变量进行赋值外，主要做了两件事情：
+     *
+     * 1.初始化日志存储服务 LogStorage 实例。
+     * 2.创建并启动一个 Disruptor 队列，用于异步处理日志操作相关的事件。
+     *
+     * @param opts
+     * @return
+     */
     @Override
     public boolean init(final LogManagerOptions opts) {
         this.writeLock.lock();
@@ -181,21 +191,26 @@ public class LogManagerImpl implements LogManager {
             lsOpts.setConfigurationManager(this.configManager);
             lsOpts.setLogEntryCodecFactory(opts.getLogEntryCodecFactory());
 
+            // ***初始化日志存储服务***
             if (!this.logStorage.init(lsOpts)) {
                 LOG.error("Fail to init logStorage");
                 return false;
             }
+
+            // 基于日志初始化本地 logIndex 和 term 值
             this.firstLogIndex = this.logStorage.getFirstLogIndex();
             this.lastLogIndex = this.logStorage.getLastLogIndex();
             this.diskId = new LogId(this.lastLogIndex, getTermFromLogStorage(this.lastLogIndex));
             this.fsmCaller = opts.getFsmCaller();
+
+            // ***创建对应的 Disruptor 队列，用于异步处理日志操作相关的事件***
             this.disruptor = DisruptorBuilder.<StableClosureEvent> newInstance() //
                     .setEventFactory(new StableClosureEventFactory()) //
                     .setRingBufferSize(opts.getDisruptorBufferSize()) //
                     .setThreadFactory(new NamedThreadFactory("JRaft-LogManager-Disruptor-", true)) //
                     .setProducerType(ProducerType.MULTI) //
                     /*
-                     *  Use timeout strategy in log manager. If timeout happens, it will called reportError to halt the node.
+                     *  Use timeout strategy in log manager. If timeout happens, it will call reportError to halt the node.
                      */
                     .setWaitStrategy(new TimeoutBlockingWaitStrategy(
                         this.raftOptions.getDisruptorPublishEventWaitTimeoutSecs(), TimeUnit.SECONDS)) //
@@ -1149,18 +1164,30 @@ public class LogManagerImpl implements LogManager {
         wm.onNewLog.onNewLog(wm.arg, wm.errorCode);
     }
 
+
+    /**
+     * 对日志数据进行一致性校验
+     * @return
+     */
     @Override
     public Status checkConsistency() {
         this.readLock.lock();
         try {
             Requires.requireTrue(this.firstLogIndex > 0);
             Requires.requireTrue(this.lastLogIndex >= 0);
+
+            // 未生成过快照，所以 firstLogIndex 应该是 1
             if (this.lastSnapshotId.equals(new LogId(0, 0))) {
                 if (this.firstLogIndex == 1) {
                     return Status.OK();
                 }
                 return new Status(RaftError.EIO, "Missing logs in (0, %d)", this.firstLogIndex);
-            } else {
+            } else {// 生成过快照，则需要保证快照与当前数据的连续性
+                /**
+                 * 比如，一共有20条日志，其中日志1-10已经被制作成了快照，那么snapshot对应的lastSnapshotId.index应该是10；
+                 * 理想情况下，没有被快照的日志对应的firstLogIndex=11，lastLogIndex=20，这样日志就是连续的。但也可以将条件放宽到快照
+                 * 的lastSnapshotId.index在10（firstLogIndex - 1）与20（lastLogIndex）之间
+                 */
                 if (this.lastSnapshotId.getIndex() >= this.firstLogIndex - 1
                     && this.lastSnapshotId.getIndex() <= this.lastLogIndex) {
                     return Status.OK();

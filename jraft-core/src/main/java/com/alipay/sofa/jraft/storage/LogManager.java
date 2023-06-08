@@ -38,7 +38,7 @@ import com.alipay.sofa.jraft.util.Describer;
 public interface LogManager extends Lifecycle<LogManagerOptions>, Describer {
 
     /**
-     * Closure to to run in stable state.
+     * Closure to run in stable state.
      *
      * @author boyan (boyan@alibaba-inc.com)
      *

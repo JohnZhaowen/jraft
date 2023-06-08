@@ -25,6 +25,9 @@ import com.alipay.sofa.jraft.util.Describer;
 
 /**
  * Finite state machine caller.
+ * JRaft 通过调用 FSMCaller 中声明的方法实现将内部运行状态透传给业务，
+ * 而 FSMCaller 在本地则基于 Disruptor 消息队列以事件的形式缓存这些内部状态，并通过异步的方式回调 StateMachine 接口声明的相应方法，
+ * 这就是 FSMCaller 整体的运行逻辑。
  *
  * @author boyan (boyan@alibaba-inc.com)
  *

@@ -24,6 +24,7 @@ import com.alipay.sofa.jraft.option.LogStorageOptions;
 
 /**
  * Log entry storage service.
+ * 定义了与 LogEntry 存储相关的 API，包括读写、截断，以及获取 logIndex 和 term 等
  *
  * @author boyan (boyan@alibaba-inc.com)
  *
